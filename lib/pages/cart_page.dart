@@ -154,7 +154,7 @@ class _CartPageState extends State<CartPage> {
                                             icon: const Icon(Icons.add_circle_outline,
                                                 color: Colors.green),
                                             onPressed: () {
-                                              cartProvider.updateQuantity(item, item.quantity + 1);
+                                              cartProvider.updateQuantity(context, item, item.quantity + 1);
                                             },
                                           ),
                                           IconButton(

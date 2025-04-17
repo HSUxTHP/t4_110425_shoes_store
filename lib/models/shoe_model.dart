@@ -7,7 +7,7 @@ class Shoe {
   final String description;
   final String size;
   late final int inStock;
-  final String maxBuy;
+  final int maxBuy;
   final DateTime dateSell;
 
 
@@ -61,7 +61,7 @@ class DetailShoe extends Shoe {
     required String description,
     required String size,
     required int inStock,
-    required String maxBuy,
+    required int maxBuy,
     required DateTime dateSell,
   }) : super(
           id: id,
@@ -112,7 +112,7 @@ class DetailShoe extends Shoe {
     required String description,
     required String size,
     required int inStock,
-    required String maxBuy,
+    required int maxBuy,
     required DateTime dateSell,
     this.quantity = 1,
   })

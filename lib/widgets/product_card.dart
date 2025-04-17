@@ -118,12 +118,40 @@ class _ProductCartState extends State<ProductCart> {
                       maxBuy: widget.shoe.maxBuy,
                       dateSell: widget.shoe.dateSell,
                     );
+
+                    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                    int existingQty = cartProvider.cartItems
+                        .where((item) => item.id == newShoe.id)
+                        .fold(0, (sum, item) => sum + item.quantity);
+
+                    // kiểm tra trước khi thêm
+                    if (existingQty >= newShoe.maxBuy) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Exceeded purchase limit for this product.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (existingQty >= newShoe.inStock) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Not enough stock'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
                     print("Add to cart: ${newShoe.name}");
-                    Provider.of<CartProvider>(context, listen: false).addToCart(context, newShoe);
+                    cartProvider.addToCart(context, newShoe);
+
                     if (widget.shoe.dateSell!.isBefore(DateTime.now())) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('${widget.shoe.name} added to cart!'),
+                          content: Text('${widget.shoe.name} has been added to cart!'),
                           duration: const Duration(seconds: 2),
                         ),
                       );

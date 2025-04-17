@@ -16,26 +16,50 @@ class CartProvider with ChangeNotifier {
 
   void addToCart(BuildContext context, ShoeInCart item) {
     int index = _cartItems.indexWhere((shoe) => shoe.id == item.id);
+
     if (index != -1) {
-      if (_cartItems[index].quantity < 99) {
-        _cartItems[index].quantity++;
+      final currentItem = _cartItems[index];
+      if (currentItem.quantity < item.maxBuy && currentItem.quantity < item.inStock) {
+        currentItem.quantity++;
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Notification'),
+            content: const Text('Maximum purchase limit reached or out of stock.'),
+            actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+          ),
+        );
       }
     } else {
       if (item.dateSell.isBefore(DateTime.now())) {
-        _cartItems.add(item);
+        if (item.inStock > 0 && item.maxBuy > 0) {
+          _cartItems.add(item);
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Notification'),
+              content: const Text('Cannot add to cart because out of stock or purchase limit exceeded.'),
+              actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
+            ),
+          );
+        }
       } else {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
-            content: const Text('Item cannot be added because the dateSell is less than today.'),
+            content: const Text('Cannot add because the sale date has not come yet.'),
             actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK'))],
           ),
         );
       }
     }
+
     notifyListeners();
   }
+
 
   void decreaseItem(ShoeInCart item) {
     int index = _cartItems.indexWhere((shoe) => shoe.id == item.id);
@@ -49,13 +73,47 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  void updateQuantity(ShoeInCart item, int newQuantity) {
+  void updateQuantity(BuildContext context, ShoeInCart item, int newQuantity) {
     int index = _cartItems.indexWhere((shoe) => shoe.id == item.id);
     if (index != -1) {
-      _cartItems[index].quantity = newQuantity.clamp(1, 99);
+      String warning = '';
+      int maxAllowed = item.maxBuy < item.inStock ? item.maxBuy : item.inStock;
+
+      if (newQuantity > item.maxBuy && newQuantity > item.inStock) {
+        warning =
+        'The quantity you selected exceeds the purchase limit (${item.maxBuy}) and existing inventory (${item.inStock}).';
+      } else if (newQuantity > item.maxBuy) {
+        warning = 'The quantity you selected exceeds the purchase limit (${item.maxBuy}).';
+      } else if (newQuantity > item.inStock) {
+        warning = 'The quantity you selected exceeds the current inventory (${item.inStock}).';
+      }
+
+      if (warning.isNotEmpty) {
+        newQuantity = maxAllowed;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Warning'),
+            content: Text('$warning\nAdjusted to allowable level: $maxAllowed'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+
+      if (newQuantity < 1) newQuantity = 1;
+
+      _cartItems[index].quantity = newQuantity;
       notifyListeners();
     }
   }
+
+
+
 
   void removeItem(ShoeInCart item) {
     _cartItems.removeWhere((shoe) => shoe.id == item.id);

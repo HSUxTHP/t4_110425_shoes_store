@@ -103,20 +103,48 @@ class DetailPage extends StatelessWidget {
                       maxBuy: shoe.maxBuy,
                       dateSell: shoe.dateSell,
                     );
+
+                    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+                    // Kiểm tra số lượng đã có trong giỏ hàng
+                    int existingQty = cartProvider.cartItems
+                        .where((item) => item.id == newShoe.id)
+                        .fold(0, (sum, item) => sum + item.quantity);
+
+                    // Kiểm tra vượt quá giới hạn maxBuy
+                    if (existingQty >= newShoe.maxBuy) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Exceeded purchase limit for this product.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Kiểm tra nếu tồn kho không đủ
+                    if (existingQty >= newShoe.inStock) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Not enough stock in stock.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Kiểm tra ngày bán của sản phẩm
                     if (shoe.dateSell!.isBefore(DateTime.now())) {
                       print("Add to cart: ${newShoe.name}");
-                      Provider
-                          .of<CartProvider>(context, listen: false)
-                          .addToCart(context, newShoe);
-                      print("Add to cart: ${shoe.name}");
+                      cartProvider.addToCart(context, newShoe);
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('${shoe.name} added to cart!'),
                           duration: const Duration(seconds: 2),
                         ),
                       );
-                    }
-                    else {
+                    } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('Item cannot be added because the dateSell is less than today.'),
