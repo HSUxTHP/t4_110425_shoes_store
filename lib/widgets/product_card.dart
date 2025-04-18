@@ -32,7 +32,7 @@ class _ProductCartState extends State<ProductCart> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  widget.shoe.imageUrl,
+                  widget.shoe.imageUrl[0],
                   height: 300,
                   width: 300,
                   fit: BoxFit.cover,

@@ -2,7 +2,7 @@
 class Shoe {
   final String id;
   final String name;
-  final String imageUrl;
+  final List<String> imageUrl;
   final double price;
   final String description;
   final String size;
@@ -40,7 +40,7 @@ class Shoe {
     return Shoe(
       id: json['id'],
       name: json['name'],
-      imageUrl: json['imageUrl'],
+      imageUrl: List<String>.from(json['imageUrl']),
       price: json['price'].toDouble(),
       description: json['description'],
       size: json['size'],
@@ -56,7 +56,7 @@ class DetailShoe extends Shoe {
   DetailShoe({
     required String id,
     required String name,
-    required String imageUrl,
+    required List<String> imageUrl,
     required double price,
     required String description,
     required String size,
@@ -90,7 +90,7 @@ class DetailShoe extends Shoe {
     return DetailShoe(
       id: json['id'],
       name: json['name'],
-      imageUrl: json['imageUrl'],
+      imageUrl: List<String>.from(json['imageUrl']),
       price: json['price'].toDouble(),
       description: json['description'],
       size: json['size'],
@@ -107,7 +107,7 @@ class DetailShoe extends Shoe {
   ShoeInCart({
     required String id,
     required String name,
-    required String imageUrl,
+    required List<String> imageUrl,
     required double price,
     required String description,
     required String size,

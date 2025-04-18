@@ -4,14 +4,21 @@ import 'package:provider/provider.dart';
 import '../models/shoe_model.dart';
 import '../providers/cart_provider.dart';
 
-class DetailPage extends StatelessWidget {
-  const DetailPage ({super.key, required this.shoe});
+class DetailPage extends StatefulWidget {
+  const DetailPage({super.key, required this.shoe});
 
   final Shoe shoe;
 
+  @override
+  State<DetailPage> createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final shoe = widget.shoe;
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(
@@ -26,14 +33,80 @@ class DetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  shoe.imageUrl,
-                  height: 300,
-                  width: 300,
-                  fit: BoxFit.cover,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      shoe.imageUrl[currentIndex],
+                      height: 300,
+                      width: 300,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // IconButton(
+                      //   icon: const Icon(Icons.arrow_back),
+                      //   onPressed: () {
+                      //     if (currentIndex > 0) {
+                      //       setState(() {
+                      //         currentIndex--;
+                      //       });
+                      //     }
+                      //   },
+                      // ),
+                      // const SizedBox(width: 16),
+                      // IconButton(
+                      //   icon: const Icon(Icons.arrow_forward),
+                      //   onPressed: () {
+                      //     if (currentIndex < shoe.imageUrl.length - 1) {
+                      //       setState(() {
+                      //         currentIndex++;
+                      //       });
+                      //     }
+                      //   },
+                      // ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(shoe.imageUrl.length, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              currentIndex = index;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: currentIndex == index ? Colors.teal : Colors.grey,
+                                width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Image.network(
+                                shoe.imageUrl[index],
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
